@@ -5,13 +5,13 @@ public class MCAccount {
 	private int id;
 	private String name;
 
-	public MCAccount(String name, int id) {
+	public MCAccount(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 
 	public MCAccount(String name) {
-		this(name, -1);
+		this(-1, name);
 	}
 
 	public String getName() {
@@ -20,6 +20,11 @@ public class MCAccount {
 
 	public int getID() {
 		return id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof MCAccount && ((MCAccount) o).name != null && ((MCAccount) o).name.equals(name);
 	}
 
 }

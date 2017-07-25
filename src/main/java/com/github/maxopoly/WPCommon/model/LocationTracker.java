@@ -17,7 +17,7 @@ public class LocationTracker {
 
 	private Set<String> recentlyUpdated;
 
-	private long snitchOverWriteThreshhold = 5000;
+	private long snitchOverWriteThreshhold = 2000;
 
 	private LocationTracker() {
 		locations = new HashMap<String, Location>();

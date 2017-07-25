@@ -48,4 +48,28 @@ public class Location {
 		return json;
 	}
 
+	@Override
+	public String toString() {
+		return x + ", " + y + ", " + z;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Location)) {
+			return false;
+		}
+		Location other = (Location) o;
+		return (other.x == x) && (other.y == y) && (other.z == z);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 24521;
+		for (double d : new double[] { x, y, z }) {
+			long f = Double.doubleToLongBits(d);
+			int c = (int) (f ^ (f >>> 32));
+			result = 37 * result + c;
+		}
+		return result;
+	}
 }
