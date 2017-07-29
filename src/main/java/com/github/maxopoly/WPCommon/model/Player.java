@@ -13,16 +13,18 @@ public class Player {
 	private MCAccount main;
 	private int standing;
 	private int altGroupId;
+	private boolean pos;
 
-	public Player(Faction faction, List<MCAccount> accounts, MCAccount main, int standing, int altGroupId) {
+	public Player(Faction faction, List<MCAccount> accounts, MCAccount main, int standing, int altGroupId, boolean pos) {
 		this.faction = faction;
 		this.accounts = accounts;
 		this.main = main;
 		this.standing = standing;
+		this.pos = pos;
 	}
 
-	public Player(Faction faction, List<MCAccount> accounts, MCAccount main, int standing) {
-		this(faction, accounts, main, standing, -1);
+	public Player(Faction faction, List<MCAccount> accounts, MCAccount main, int standing, boolean pos) {
+		this(faction, accounts, main, standing, -1, false);
 	}
 
 	public Player(JSONObject json) {
@@ -37,6 +39,7 @@ public class Player {
 			MCAccount alt = new MCAccount(altArray.getString(i));
 			accounts.add(alt);
 		}
+		this.pos = json.optBoolean("pos", false);
 		this.standing = json.getInt("standing");
 	}
 
@@ -54,6 +57,10 @@ public class Player {
 
 	public MCAccount getMain() {
 		return main;
+	}
+
+	public boolean isPOS() {
+		return pos;
 	}
 
 	public int getAltGroupId() {
@@ -97,6 +104,7 @@ public class Player {
 		if (faction != null) {
 			json.put("faction", faction.serialize());
 		}
+		json.put("pos", pos);
 		return json;
 	}
 }
