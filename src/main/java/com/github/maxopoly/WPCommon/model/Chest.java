@@ -63,11 +63,16 @@ public class Chest {
 	}
 
 	public void addItem(WPItem item) {
+		boolean found = false;
 		for (WPItem chestItem : content) {
 			if (chestItem.equals(item)) {
 				chestItem.setAmount(item.getAmount() + chestItem.getAmount());
+				found = true;
 				break;
 			}
+		}
+		if (!found) {
+			content.add(item);
 		}
 	}
 

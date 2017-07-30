@@ -12,16 +12,14 @@ public class LocationTracker {
 	// instance
 	private static LocationTracker instance;
 
-	private Map<String, Location> locations;
-	private Map<String, Long> lastUpdated;
+	private Map<String, LoggedPlayerLocation> locations;
 
 	private Set<String> recentlyUpdated;
 
 	private long snitchOverWriteThreshhold = 2000;
 
 	private LocationTracker() {
-		locations = new HashMap<String, Location>();
-		lastUpdated = new HashMap<String, Long>();
+		locations = new HashMap<String, LoggedPlayerLocation>();
 		recentlyUpdated = new HashSet<String>();
 	}
 
@@ -38,42 +36,47 @@ public class LocationTracker {
 		return copy;
 	}
 
-	public synchronized void reportSnitch(String name, Location location) {
+	public synchronized void reportSnitchLocation(String name, Location location) {
 		// this needs to be separate from normal location reporting, because we dont want snitch hits, which just report the
 		// location of the snitch, to overwrite radar based data
-		Long time = lastUpdated.get(name);
-		if (time == null) {
+		LoggedPlayerLocation previous = locations.get(name);
+		LoggedPlayerLocation replacement = new LoggedPlayerLocation(location, name, LocationType.SNITCH);
+		if (previous == null) {
 			// not tracked so far
-			reportLocation(name, location);
+			reportLocation(replacement);
 			return;
 		}
-		long current = System.currentTimeMillis();
-		if (current - time > snitchOverWriteThreshhold) {
-			reportLocation(name, location);
+		if (replacement.getTimeStamp() - previous.getTimeStamp() > snitchOverWriteThreshhold) {
+			reportLocation(replacement);
 		}
 	}
 
-	public synchronized void reportLocally(String name, Location location) {
-		locations.put(name, location);
-		lastUpdated.put(name, System.currentTimeMillis());
+	public synchronized void reportRadarLocation(String name, Location location) {
+		reportLocation(new LoggedPlayerLocation(location, name, LocationType.RADAR));
 	}
 
-	public synchronized void reportLocation(String name, Location location) {
-		recentlyUpdated.add(name);
-		reportLocally(name, location);
+	public synchronized void reportLocally(LoggedPlayerLocation loc) {
+		LoggedPlayerLocation existing = locations.get(loc.getPlayer());
+		if (existing != null && existing.getTimeStamp() > loc.getTimeStamp()) {
+			// newer data already exists
+			return;
+		}
+
+		locations.put(loc.getPlayer(), loc);
 	}
 
-	public synchronized Location getLastKnownLocation(String player) {
+	public synchronized void reportLocation(LoggedPlayerLocation loc) {
+		LoggedPlayerLocation existing = locations.get(loc.getPlayer());
+		if (existing != null && existing.getTimeStamp() > loc.getTimeStamp()) {
+			// newer data already exists
+			return;
+		}
+		recentlyUpdated.add(loc.getPlayer());
+		locations.put(loc.getPlayer(), loc);
+	}
+
+	public synchronized LoggedPlayerLocation getLastKnownLocation(String player) {
 		return locations.get(player);
-	}
-
-	public synchronized long getMillisSinceLastReport(String player) {
-		Long time = lastUpdated.get(player);
-		if (time == null) {
-			// not tracked so far
-			return -1;
-		}
-		return System.currentTimeMillis() - time;
 	}
 
 }

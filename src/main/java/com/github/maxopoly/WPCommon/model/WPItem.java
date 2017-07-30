@@ -106,6 +106,41 @@ public class WPItem {
 		return sb.toString();
 	}
 
+	public void setDurability(int durability) {
+		this.durability = durability;
+	}
+
+	public boolean isRepairable() {
+		// fail fast first
+		if (id > 317 || id < 256) {
+			return false;
+		}
+		// dia tools + some other
+		if (id >= 267 && id <= 279) {
+			return true;
+		}
+		// iron tools + flint&steel
+		if (id >= 256 && id <= 259) {
+			return true;
+		}
+		// bow
+		if (id == 261) {
+			return true;
+		}
+		// gold tools
+		if (id >= 283 && id <= 286) {
+			return true;
+		}
+		// hoes
+		if (id >= 290 && id <= 294) {
+			return true;
+		}
+		if (id >= 298 && id <= 317) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean equalsBase(WPItem i) {
 		return i.id == id && i.durability == durability;
 	}
