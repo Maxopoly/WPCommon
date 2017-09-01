@@ -37,7 +37,18 @@ public enum PacketIndex {
 	// binary map data
 	MapData(PacketType.BINARY, PacketDirection.BiDirectional),
 	// indicates that a onesided transfer of map data was completed
-	MapDataTransferComplete(PacketType.JSON, PacketDirection.BiDirectional);
+	MapDataTransferComplete(PacketType.JSON, PacketDirection.BiDirectional),
+
+	// invalidates a single players info entry
+	InvalidateSinglePlayerInfo(PacketType.JSON, PacketDirection.ServerToClient),
+	// invalidates all player info kept client side
+	InvalidateAllPlayerInfo(PacketType.JSON, PacketDirection.ServerToClient),
+
+	// Login success package to tell the player about his permissions, protocol version etc.
+	LoginSuccess(PacketType.JSON, PacketDirection.ServerToClient),
+
+	// Sends the player all waypoints known serverside, also invalidates all existing ones clientside
+	WaypointInformation(PacketType.JSON, PacketDirection.ServerToClient);
 
 	private int id;
 	private PacketType type;
