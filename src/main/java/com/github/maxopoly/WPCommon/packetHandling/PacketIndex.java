@@ -48,7 +48,10 @@ public enum PacketIndex {
 	LoginSuccess(PacketType.JSON, PacketDirection.ServerToClient),
 
 	// Sends the player all waypoints known serverside, also invalidates all existing ones clientside
-	WaypointInformation(PacketType.JSON, PacketDirection.ServerToClient);
+	WaypointInformation(PacketType.JSON, PacketDirection.ServerToClient),
+
+	// Deletes a chest that was detected to no longer exist
+	DeleteChest(PacketType.JSON, PacketDirection.ClientToServer);
 
 	private int id;
 	private PacketType type;

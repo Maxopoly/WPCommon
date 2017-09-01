@@ -41,6 +41,10 @@ public class Chest {
 		return json;
 	}
 
+	public void clear() {
+		content.clear();
+	}
+
 	public Location getLocation() {
 		return location;
 	}
