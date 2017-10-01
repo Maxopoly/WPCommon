@@ -1,5 +1,7 @@
 package com.github.maxopoly.WPCommon.packetHandling.incoming;
 
+import com.github.maxopoly.WPCommon.model.permission.PermissionLevel;
+import com.github.maxopoly.WPCommon.packetHandling.PacketIndex;
 import com.github.maxopoly.WPCommon.util.AES_CFB8_Encrypter;
 import com.github.maxopoly.WPCommon.util.CompressionManager;
 import com.github.maxopoly.WPCommon.util.VarInt;
@@ -17,12 +19,14 @@ public class IncomingDataHandler {
 	private AES_CFB8_Encrypter encrypter;
 	private Runnable failureCallback;
 	private volatile boolean active;
+	private PermissionLevel permLevel;
 
 	public IncomingDataHandler(Logger logger, DataInputStream input, AES_CFB8_Encrypter encrypter,
-			Runnable failureCallback) {
+			Runnable failureCallback, PermissionLevel permLevel) {
 		this.input = input;
 		this.failureCallback = failureCallback;
 		this.logger = logger;
+		this.permLevel = permLevel;
 		this.encrypter = encrypter;
 		this.handlers = new TreeMap<Integer, GenericDataForwarder<?>>();
 	}
@@ -47,6 +51,12 @@ public class IncomingDataHandler {
 				input.readFully(dataArray);
 				byte[] decrypted = encrypter.decrypt(dataArray);
 				byte[] decompressed = CompressionManager.decompress(decrypted, logger);
+				PacketIndex pIndex = PacketIndex.getPacket(packetID);
+				if (pIndex != null && pIndex.hasRequiredClientPermission()) {
+					if (!permLevel.hasPermission(pIndex.getRequiredClientPermission())) {
+						continue;
+					}
+				}
 				GenericDataForwarder<?> handler = handlers.get(dataType);
 				if (handler != null) {
 					handler.handle(decompressed, packetID);
@@ -54,13 +64,18 @@ public class IncomingDataHandler {
 					logger.error("Received data for handler type " + dataType + ", but no handler existed");
 				}
 			} catch (IOException e) {
-				logger.error("Error handling incoming packets", e);
+				stopHandling();
 				failureCallback.run();
+				return;
 			}
 		}
 	}
 
 	public void stopHandling() {
 		active = false;
+	}
+
+	public void updatePermissionLevel(PermissionLevel perm) {
+		this.permLevel = perm;
 	}
 }

@@ -41,6 +41,14 @@ public class Chest {
 		return json;
 	}
 
+	public int getTotalItemAmount() {
+		int sum = 0;
+		for (WPItem chestItem : content) {
+			sum += chestItem.getAmount();
+		}
+		return sum;
+	}
+
 	public void clear() {
 		content.clear();
 	}

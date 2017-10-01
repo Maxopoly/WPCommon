@@ -28,10 +28,12 @@ public class OutgoingDataHandler {
 			@Override
 			public void run() {
 				while (active) {
-					IPacket packet;
+					IPacket packet = null;
 					synchronized (packetQueue) {
-
-						while (packetQueue.isEmpty()) {
+						while (packetQueue.isEmpty() && active) {
+							if (!active) {
+								return;
+							}
 							try {
 								packetQueue.wait();
 							} catch (InterruptedException e) {
@@ -53,7 +55,10 @@ public class OutgoingDataHandler {
 	}
 
 	public void stop() {
-		this.active = false;
+		synchronized (packetQueue) {
+			this.active = false;
+			packetQueue.notifyAll();
+		}
 	}
 
 	private void sendData(IPacket packet) {
