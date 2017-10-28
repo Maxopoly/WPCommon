@@ -9,7 +9,7 @@ public enum PacketIndex {
 	// NEVER EVER CHANGE THE ORDER OF THESE. ONLY ADD NEW ONES AT THE BOTTOM.
 
 	// sent after encryption was figured out to initiate the auth process
-	InitAuth(PacketType.JSON, PacketDirection.ClientToServer),
+	InitAuth(PacketType.JSON, PacketDirection.ClientToServer, Permission.AUTH),
 
 	// sent to request alts, standing, faction info etc. for a certain player
 	PlayerInfoRequest(PacketType.JSON, PacketDirection.ClientToServer, Permission.STANDING_LOOKUP),
@@ -30,7 +30,7 @@ public enum PacketIndex {
 	// anyone hitting snitches
 	PlayerLocationPull(PacketType.JSON, PacketDirection.ClientToServer, Permission.OWN_LOCATION_POST),
 	// used to distribute known player locations
-	PlayerLocationPush(PacketType.JSON, PacketDirection.ServerToClient, Permission.RADAR_LOCATION_POST),
+	PlayerLocationPush(PacketType.JSON, PacketDirection.ServerToClient, Permission.RADAR_LOCATION_READ),
 
 	// initiates map data sync by sending hashes and timestamps of all data the player has to the server
 	MapDataSyncInit(PacketType.JSON, PacketDirection.ClientToServer, Permission.MAP_SYNC),
